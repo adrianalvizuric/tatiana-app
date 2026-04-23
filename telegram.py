@@ -1,4 +1,4 @@
-"""Telegram bot integration: push Tatiana's answers to Adria, pull his replies back."""
+"""Telegram bot integration: push Tatiana's answers to Adrian, pull his replies back."""
 from __future__ import annotations
 
 import requests
@@ -18,7 +18,7 @@ def _chat_id() -> str:
 
 
 def send_to_adria(*, question_text: str, answer_text: str, asked_adria: bool, local_time: str) -> int | None:
-    """DM Adria with Tatiana's answer. Returns the sent message_id (used to match replies)."""
+    """DM Adrian with Tatiana's answer. Returns the sent message_id (used to match replies)."""
     flag = " ↩️ (хочет твой ответ)" if asked_adria else ""
     body = (
         f"💌 Таня ответила{flag}\n"
@@ -47,7 +47,7 @@ def send_notification(body: str) -> None:
 
 
 def poll_replies() -> int:
-    """Fetch new Telegram updates, match Adria's replies to pending answers, write them to Sheets.
+    """Fetch new Telegram updates, match Adrian's replies to pending answers, write them to Sheets.
 
     Returns the number of new replies written.
     """

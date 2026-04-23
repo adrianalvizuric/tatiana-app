@@ -22,7 +22,7 @@ def _already_answered_today() -> bool:
 
 
 def _unread_adria_replies() -> int:
-    """Replies from Adria that landed since her last visit (very rough: last 24h)."""
+    """Replies from Adrian that landed since her last visit (very rough: last 24h)."""
     # Simple heuristic for MVP: count all replies that exist. Tab visit clears the badge via session state.
     if st.session_state.get("seen_from_adria_tab"):
         return 0
@@ -230,6 +230,6 @@ def render_from_adria() -> None:
         if q:
             st.caption(q.text_ru)
         st.write(f"**Ты:** {a.answer}")
-        st.write(f"**Adria:** {a.adria_reply}")
+        st.write(f"**Adrian:** {a.adria_reply}")
         st.caption(a.adria_reply_at)
         st.divider()

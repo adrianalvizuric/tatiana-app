@@ -1,6 +1,6 @@
 """Seed question decks and scripted reactions into the Sheet.
 
-Mood messages are NOT seeded here — Adria writes them directly in the
+Mood messages are NOT seeded here — Adrian writes them directly in the
 `moods` tab (columns: id, mood, text_ru). Recommended IDs: miss_1..miss_5,
 cant_sleep_1..cant_sleep_5.
 
