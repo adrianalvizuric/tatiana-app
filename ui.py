@@ -99,20 +99,10 @@ def render_daily_question() -> None:
     st.caption(f"{ru.QUESTION_OF_THE_DAY} · {deck_label}")
     st.header(question.text_ru)
 
-    # Already answered today's card → show a done state, not the form
+    # Already answered today's card → skip straight to mood picker
     if todays_answer is not None:
-        reaction = st.session_state.pop("last_reaction", None)
-        if reaction:
-            st.balloons()
-            st.success(reaction)
-        else:
-            st.success(ru.ANSWERED_TODAY)
-        with st.container(border=True):
-            st.caption("Твой ответ")
-            st.write(todays_answer.answer)
-        if st.button(ru.GO_TO_MOODS, type="primary", use_container_width=True):
-            st.session_state["view"] = "mood_picker"
-            st.rerun()
+        st.session_state["view"] = "mood_picker"
+        st.rerun()
         return
 
     with st.form("answer_form", clear_on_submit=True):
@@ -144,6 +134,11 @@ def render_daily_question() -> None:
 # ---------------------------------------------------------------- mood picker
 
 def render_mood_picker() -> None:
+    reaction = st.session_state.pop("last_reaction", None)
+    if reaction:
+        st.balloons()
+        st.toast(reaction, icon="💌")
+
     st.header(ru.MOOD_PICKER_TITLE)
     for mood_key, mood_label in ru.MOOD_LABELS.items():
         if st.button(mood_label, use_container_width=True, key=f"mood_{mood_key}"):
