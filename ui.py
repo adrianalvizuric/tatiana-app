@@ -12,6 +12,35 @@ import telegram
 
 # ---------------------------------------------------------------- helpers
 
+_FLOWER_EMOJIS = ["🌸", "🌺", "🌷", "💐", "🌹", "🏵️", "🌻", "🪷"]
+
+
+def flowers() -> None:
+    """Drop-in replacement for st.balloons() that uses falling flower emojis."""
+    spans: list[str] = []
+    for _ in range(30):
+        emoji = random.choice(_FLOWER_EMOJIS)
+        left = random.uniform(0, 100)
+        delay = random.uniform(0, 1.2)
+        dur = random.uniform(3.0, 5.0)
+        size = random.uniform(1.4, 2.4)
+        spans.append(
+            f'<span class="flower" style="left:{left:.1f}vw;'
+            f'animation-delay:{delay:.2f}s;animation-duration:{dur:.2f}s;'
+            f'font-size:{size:.2f}rem;">{emoji}</span>'
+        )
+    html = (
+        "<style>"
+        "@keyframes floatDown{0%{transform:translateY(-10vh) rotate(0deg);opacity:1}"
+        "100%{transform:translateY(110vh) rotate(540deg);opacity:.4}}"
+        ".flower-container{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}"
+        ".flower{position:absolute;top:0;animation:floatDown linear forwards}"
+        "</style>"
+        '<div class="flower-container">' + "".join(spans) + "</div>"
+    )
+    st.markdown(html, unsafe_allow_html=True)
+
+
 def _today_iso() -> str:
     return data.today_local().isoformat()
 
@@ -136,7 +165,7 @@ def render_daily_question() -> None:
 def render_mood_picker() -> None:
     reaction = st.session_state.pop("last_reaction", None)
     if reaction:
-        st.balloons()
+        flowers()
         st.toast(reaction, icon="💌")
 
     st.header(ru.MOOD_PICKER_TITLE)
