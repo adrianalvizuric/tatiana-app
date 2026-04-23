@@ -38,8 +38,11 @@ def main() -> None:
 
     try:
         telegram.poll_replies()
-    except Exception:
-        pass  # network hiccups shouldn't break the page
+    except Exception as e:
+        try:
+            telegram.send_notification(f"⚠️ poll_replies failed: {type(e).__name__}: {e}")
+        except Exception:
+            pass
 
     view = st.session_state.get("view", "home")
     if view == "home":
