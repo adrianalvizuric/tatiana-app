@@ -22,6 +22,8 @@ YOUR_ANSWER_PLACEHOLDER = "Напиши свой ответ..."
 SEND = "Отправить"
 ASK_ADRIA_TOO = "Тоже хочу услышать, что ответит Adria"
 ANSWER_SAVED = "Сохранено ✓"
+ANSWERED_TODAY = "Ты уже ответила сегодня 💌"
+GO_TO_MOODS = "Читать что-нибудь от Adria →"
 
 MOOD_PICKER_TITLE = "Как ты себя чувствуешь?"
 MOOD_MISS = "Скучаю"

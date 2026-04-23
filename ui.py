@@ -88,9 +88,32 @@ def render_daily_question() -> None:
         st.info(ru.NO_QUESTIONS_YET)
         return
 
+    today_iso = data.today_local().isoformat()
+    todays_answer = next(
+        (a for a in data.all_answers()
+         if a.card_id == question.id and a.timestamp.startswith(today_iso)),
+        None,
+    )
+
     deck_label = ru.DECK_LABELS.get(question.deck, question.deck)
     st.caption(f"{ru.QUESTION_OF_THE_DAY} · {deck_label}")
     st.header(question.text_ru)
+
+    # Already answered today's card → show a done state, not the form
+    if todays_answer is not None:
+        reaction = st.session_state.pop("last_reaction", None)
+        if reaction:
+            st.balloons()
+            st.success(reaction)
+        else:
+            st.success(ru.ANSWERED_TODAY)
+        with st.container(border=True):
+            st.caption("Твой ответ")
+            st.write(todays_answer.answer)
+        if st.button(ru.GO_TO_MOODS, type="primary", use_container_width=True):
+            st.session_state["view"] = "mood_picker"
+            st.rerun()
+        return
 
     with st.form("answer_form", clear_on_submit=True):
         answer_text = st.text_area(
@@ -114,9 +137,8 @@ def render_daily_question() -> None:
             data.set_answer_telegram_id(answer_id, msg_id)
 
         reactions = data.all_reactions()
-        reaction = random.choice(reactions) if reactions else ru.ANSWER_SAVED
-        st.success(reaction)
-        st.balloons()
+        st.session_state["last_reaction"] = random.choice(reactions) if reactions else ru.ANSWER_SAVED
+        st.rerun()
 
 
 # ---------------------------------------------------------------- mood picker
