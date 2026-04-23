@@ -4,6 +4,7 @@ from __future__ import annotations
 import random
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 import data
 import ru
@@ -16,29 +17,41 @@ _FLOWER_EMOJIS = ["🌸", "🌺", "🌷", "💐", "🌹", "🏵️", "🌻", "�
 
 
 def flowers() -> None:
-    """Drop-in replacement for st.balloons() that uses falling flower emojis."""
-    spans: list[str] = []
-    for _ in range(30):
-        emoji = random.choice(_FLOWER_EMOJIS)
-        left = random.uniform(0, 100)
-        delay = random.uniform(0, 1.2)
-        dur = random.uniform(3.0, 5.0)
-        size = random.uniform(1.4, 2.4)
-        spans.append(
-            f'<span class="flower" style="left:{left:.1f}vw;'
-            f'animation-delay:{delay:.2f}s;animation-duration:{dur:.2f}s;'
-            f'font-size:{size:.2f}rem;">{emoji}</span>'
-        )
-    html = (
-        "<style>"
-        "@keyframes floatDown{0%{transform:translateY(-10vh) rotate(0deg);opacity:1}"
-        "100%{transform:translateY(110vh) rotate(540deg);opacity:.4}}"
-        ".flower-container{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}"
-        ".flower{position:absolute;top:0;animation:floatDown linear forwards}"
-        "</style>"
-        '<div class="flower-container">' + "".join(spans) + "</div>"
-    )
-    st.markdown(html, unsafe_allow_html=True)
+    """Drop-in replacement for st.balloons() that uses falling flower emojis.
+
+    Injects elements into the parent document via an iframe bridge so they
+    escape any Streamlit container transforms that would otherwise clip
+    position:fixed.
+    """
+    emojis_js = ",".join(f'"{e}"' for e in _FLOWER_EMOJIS)
+    html = f"""
+    <script>
+    (function() {{
+      const doc = window.parent.document;
+      const emojis = [{emojis_js}];
+      if (!doc.getElementById('tatiana-flower-style')) {{
+        const style = doc.createElement('style');
+        style.id = 'tatiana-flower-style';
+        style.textContent =
+          '@keyframes tatianaFlowerFall{{0%{{transform:translateY(-10vh) rotate(0deg);opacity:1}}100%{{transform:translateY(110vh) rotate(540deg);opacity:.4}}}}' +
+          '.tatiana-flower{{position:fixed;top:0;pointer-events:none;z-index:99999;animation:tatianaFlowerFall linear forwards}}';
+        doc.head.appendChild(style);
+      }}
+      for (let i = 0; i < 30; i++) {{
+        const f = doc.createElement('span');
+        f.className = 'tatiana-flower';
+        f.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        f.style.left = (Math.random() * 100) + 'vw';
+        f.style.fontSize = (1.4 + Math.random() * 1.0) + 'rem';
+        f.style.animationDelay = (Math.random() * 1.2) + 's';
+        f.style.animationDuration = (3 + Math.random() * 2) + 's';
+        doc.body.appendChild(f);
+        setTimeout(() => f.remove(), 6500);
+      }}
+    }})();
+    </script>
+    """
+    components.html(html, height=0)
 
 
 def _today_iso() -> str:
@@ -157,6 +170,7 @@ def render_daily_question() -> None:
 
         reactions = data.all_reactions()
         st.session_state["last_reaction"] = random.choice(reactions) if reactions else ru.ANSWER_SAVED
+        st.session_state["view"] = "mood_picker"
         st.rerun()
 
 
