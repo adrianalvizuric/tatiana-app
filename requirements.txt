@@ -1,0 +1,5 @@
+streamlit>=1.56
+gspread>=6.2
+google-auth>=2.49
+pytz>=2026.1
+requests>=2.33
